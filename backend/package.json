@@ -1,0 +1,44 @@
+{
+  "name": "bridgeai-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "产研职能沟通翻译助手后端服务",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "lint": "eslint src/**/*.js"
+  },
+  "keywords": [
+    "ai",
+    "translation",
+    "bridge",
+    "pm",
+    "dev"
+  ],
+  "author": "BridgeAI Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "validator": "^13.11.0",
+    "winston": "^3.11.0",
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.55.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
