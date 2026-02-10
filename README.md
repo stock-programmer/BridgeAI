@@ -97,7 +97,7 @@
 
 ### 3. 流式输出（打字机效果）
 
-- 使用 Server-Sent Events (SSE) 实现实时流式输出
+- 使用 WebSocket 实现实时双向通信和流式输出
 - 提供沉浸式交互体验，实时查看 AI 翻译过程
 
 ---
@@ -361,7 +361,7 @@ npm run dev
 │                    Zustand Store                              │
 │                   (translationStore)                          │
 └──────────────────────────┬───────────────────────────────────┘
-                           │ HTTP POST/SSE
+                           │ WebSocket
                            ▼
 ┌──────────────────────────────────────────────────────────────┐
 │                     Backend (Express)                         │
@@ -372,8 +372,8 @@ npm run dev
 │                            │                  │               │
 │                            ▼                  ▼               │
 │                    ┌────────────┐    ┌────────────────┐       │
-│                    │  Prompt    │    │  Stream        │       │
-│                    │  Service   │    │  Service (SSE) │       │
+│                    │  Prompt    │    │  WebSocket     │       │
+│                    │  Service   │    │  Handler       │       │
 │                    └────────────┘    └────────────────┘       │
 └──────────────────────────┬───────────────────────────────────┘
                            │ HTTPS Request
@@ -386,27 +386,39 @@ npm run dev
 
 ### API 接口
 
-#### POST /api/translate/stream（推荐）
+#### WebSocket 流式翻译接口（推荐）
 
-流式翻译接口，使用 Server-Sent Events (SSE)
+使用 WebSocket 实现实时双向通信和流式翻译
 
-**请求体**：
+**连接地址**：
+```
+ws://localhost:3000
+```
+
+**客户端发送消息**：
 ```json
 {
-  "role": "pm",  // 或 "dev"
-  "content": "用户输入的内容"
+  "type": "translate",
+  "payload": {
+    "role": "pm",  // 或 "dev"
+    "content": "用户输入的内容",
+    "timestamp": 1234567890
+  }
 }
 ```
 
-**响应**：
-```
-Content-Type: text/event-stream
+**服务端推送消息**：
+```json
+// 流式文本片段
+{"type":"chunk","payload":{"content":"【致开发团队"}}
+{"type":"chunk","payload":{"content":"：技术实现拆解】\n\n"}}
+{"type":"chunk","payload":{"content":"1. 核心技术挑战..."}}
 
-data: {"type":"chunk","payload":{"content":"【致开发团队"}}
-data: {"type":"chunk","payload":{"content":"：技术实现拆解】\n\n"}}
-data: {"type":"chunk","payload":{"content":"1. 核心技术挑战..."}}
-...
-data: {"type":"done","payload":{"totalTokens":1250}}
+// 完成消息
+{"type":"done","payload":{"totalTokens":1250}}
+
+// 错误消息
+{"type":"error","payload":{"error":"错误描述"}}
 ```
 
 #### POST /api/translate
@@ -572,7 +584,7 @@ context/
 **backend-architecture.md**：
 - Node.js + Express 架构
 - Qwen LLM 集成方案
-- SSE 流式输出实现
+- WebSocket 流式输出实现
 - 中间件设计（日志、限流、错误处理）
 
 #### 4. dev-plan/ - 开发计划（DAG 任务图）
@@ -609,8 +621,8 @@ leishi/
 │   │   ├── controllers/              # 控制器
 │   │   ├── services/                 # 业务服务
 │   │   │   ├── llm.service.js        # Qwen LLM 核心服务
-│   │   │   ├── prompt.service.js     # 提示词构建
-│   │   │   └── stream.service.js     # SSE 流式服务
+│   │   │   └── prompt.service.js     # 提示词构建
+│   │   ├── websocket.js              # WebSocket 服务
 │   │   ├── middleware/               # 中间件
 │   │   ├── prompts/                  # 提示词模板
 │   │   │   └── system-prompt.js      # 核心系统提示词
